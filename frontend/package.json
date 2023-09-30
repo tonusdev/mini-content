@@ -1,0 +1,39 @@
+{
+  "name": "mini-content-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "cssnano": "^6.0.1",
+    "dayjs": "^1.11.10",
+    "graphql": "^16.8.1",
+    "jotai": "^2.4.3",
+    "next": "13.4.1",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-use": "^17.4.0",
+    "sass": "^1.68.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@tanstack/eslint-plugin-query": "^4.34.1",
+    "@types/node": "^20.7.0",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "autoprefixer": "^10.4.16",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "eslint-config-prettier": "^9.0.0",
+    "postcss": "^8.4.30",
+    "prettier": "^3.0.3",
+    "prettier-plugin-tailwindcss": "^0.5.4",
+    "tailwindcss": "^3.3.3",
+    "typescript": "latest"
+  }
+}
