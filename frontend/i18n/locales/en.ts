@@ -6,7 +6,7 @@ export default {
   'archive': 'Archive',
   'new_article': 'New article',
   'content_for_all': 'Content for all users',
-  'content_for_premium': 'Content for only for Premium users',
+  'content_for_premium': 'Content for only Premium users',
   'publish': 'Publish',
   'enter_premium_content': 'Enter content for Premium users',
   'enter_anyone_content': 'Enter content for all users',
