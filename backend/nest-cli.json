@@ -7,6 +7,11 @@
     "typeCheck": true,
     "deleteOutDir": true,
     "watchAssets": true,
-    "assets": ["./i18n/locales/"]
+    "assets": [
+      {
+        "include": "./i18n/locales/",
+        "watchAssets": true
+      }
+    ]
   }
 }

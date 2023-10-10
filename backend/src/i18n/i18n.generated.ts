@@ -3,7 +3,8 @@
 import { Path } from "nestjs-i18n-telegraf";
 export type I18nTranslations = {
     "common": {
-        "test": string;
+        "message": string;
+        "button": string;
     };
 };
 export type I18nPath = Path<I18nTranslations>;

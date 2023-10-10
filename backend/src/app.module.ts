@@ -2,7 +2,13 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { ApolloServerPlugin } from "@apollo/server";
 import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { Context, Telegraf, session } from "telegraf";
+import { Context, Telegraf } from "telegraf";
+import {
+  DateTimeTypeDefinition,
+  DateTimeResolver,
+  JSONDefinition,
+  JSONResolver,
+} from "graphql-scalars";
 import { GraphQLModule } from "@nestjs/graphql";
 import { I18nModule, I18nYamlLoader } from "nestjs-i18n-telegraf";
 import { Logger, LoggerModule } from "nestjs-pino";
@@ -11,18 +17,17 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { NoSchemaIntrospectionCustomRule } from "graphql";
 import { TelegrafModule } from "nestjs-telegraf";
 import path, { join } from "path";
-import { AppConfig, defaultConfig, validateAppConfig } from "./app.config";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import { ExampleModule } from "./example/example.module";
-import { TelegrafResolver } from "./i18n/i18n.resolver";
+import { AppConfig, validateAppConfig } from "./app.config";
+import { ArticlesModule } from "./articles/articles.module";
+import { AuthModule } from "./auth/auth.module";
 import { BotModule } from "./bot/bot.module";
+import { TelegrafResolver } from "./i18n/i18n.resolver";
 
 @Module({
   imports: [
     LoggerModule.forRoot(),
     ConfigModule.forRoot({
-      load: [defaultConfig],
+      isGlobal: true,
       validate: validateAppConfig,
     }),
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
@@ -41,7 +46,7 @@ import { BotModule } from "./bot/bot.module";
 
         const validationRules: any[] = [];
         if (
-          configService.get<AppConfig["GRAPHQL_ENABLE_INTROSPECTION"]>(
+          !configService.get<AppConfig["GRAPHQL_ENABLE_INTROSPECTION"]>(
             "GRAPHQL_ENABLE_INTROSPECTION",
           )
         ) {
@@ -54,6 +59,13 @@ import { BotModule } from "./bot/bot.module";
           sortSchema: true,
           plugins,
           validationRules,
+          typeDefs: [DateTimeTypeDefinition, JSONDefinition],
+          resolvers: { DateTime: DateTimeResolver, JSON: JSONResolver },
+          cors: {
+            credentials: true,
+            origin: "*",
+          },
+          context: ({ req, res }) => ({ req, res }),
         };
       },
       inject: [ConfigService],
@@ -84,6 +96,9 @@ import { BotModule } from "./bot/bot.module";
     TelegrafModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService, logger: Logger) => {
+        const TELEGRAM_TEST_SERVER = configService.get<
+          AppConfig["TELEGRAM_TEST_SERVER"]
+        >("TELEGRAM_TEST_SERVER")!;
         const BOT_TOKEN =
           configService.get<AppConfig["BOT_TOKEN"]>("BOT_TOKEN")!;
         const BOT_WEBHOOK_DOMAIN =
@@ -110,7 +125,7 @@ import { BotModule } from "./bot/bot.module";
         }
 
         return {
-          token: BOT_TOKEN,
+          token: BOT_TOKEN + (TELEGRAM_TEST_SERVER ? "/test" : ""),
           middlewares: [
             async (ctx: Context, next) => {
               if (
@@ -123,7 +138,6 @@ import { BotModule } from "./bot/bot.module";
 
               await next();
             },
-            session({}),
             async (ctx: Context, next) => {
               const now = () => {
                 const ts = process.hrtime();
@@ -145,10 +159,9 @@ import { BotModule } from "./bot/bot.module";
       },
       inject: [ConfigService, Logger],
     }),
-    ExampleModule,
     BotModule,
+    AuthModule,
+    ArticlesModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

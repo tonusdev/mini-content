@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: "backend"
+    ports:
+      - "127.0.0.1:3001:3001"
+    restart: always
+    tty: true
+    environment:
+      - APP_PORT=3001
+      - APP_ADDRESS=0.0.0.0
+      - CORS_ALLOWED_HEADERS=Content-Type,Authorization
+      - CORS_CREDENTIALS=true
+      - CORS_METHODS=GET,POST,OPTIONS
+      - CORS_ORIGIN=*
+      - TELEGRAM_TEST_SERVER=
+      - GRAPHQL_ENABLE_IDE=
+      - GRAPHQL_ENABLE_INTROSPECTION=
+      - MONGODB_URI=mongodb://${MONGODB_USER}:${MONGODB_PASS}@mongodb:27017/${MONGODB_DATABASE}?authSource=admin
+      - BOT_TOKEN=${BOT_TOKEN}
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRES_IN=1h
+      - JWT_SECRET=${JWT_SECRET}
+      - DOMAIN=${DOMAIN}
+      - NODE_ENV=production
+      - BOT_MINIAPP_LINK=${BOT_MINIAPP_LINK}
+      - BOT_WEBHOOK_DOMAIN=${BOT_WEBHOOK_DOMAIN}
+      - BOT_WEBHOOK_PATH=${BOT_WEBHOOK_PATH}
+      - BOT_WEBHOOK_SECRET_TOKEN=${BOT_WEBHOOK_SECRET_TOKEN}
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_GRAPHQL_ENDPOINT: ${NEXT_PUBLIC_GRAPHQL_ENDPOINT}
+        NEXT_PUBLIC_MINI_APP_LINK: ${NEXT_PUBLIC_MINI_APP_LINK}
+        GRAPHQL_SERVER_ENDPOINT: http://backend:3001/graphql
+    image: "frontend"
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: always
+    tty: true
+
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - 127.0.0.1:27077:27017
+    volumes:
+      - mongodb-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASS}
+    tty: true
+
+volumes:
+  mongodb-data:

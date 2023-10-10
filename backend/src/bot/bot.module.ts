@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { BotService } from './bot.service';
 import { BotUpdate } from './bot.update';
-import { OpenMiniAppScene } from './scenes/open-mini-app.scene';
+import { ConfigModule } from '@nestjs/config';
+import { Module } from '@nestjs/common';
 
 @Module({
-  providers: [BotService, BotUpdate, OpenMiniAppScene],
+  imports: [ConfigModule],
+  providers: [BotUpdate],
 })
 export class BotModule {}
