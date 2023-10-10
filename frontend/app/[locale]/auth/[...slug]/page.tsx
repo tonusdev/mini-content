@@ -28,7 +28,10 @@ export default function AuthPage() {
     if (isSuccess && data.authenticate === true && webApp) {
       const routeTo = pathname.substring(pathname.indexOf('/auth') + 5)
       const { initData } = launchParams
-      const locale = initData?.user?.languageCode ?? ''
+      let locale = initData?.user?.languageCode ?? ''
+      if (!['en', 'uk', 'ru'].includes(locale)) {
+        locale = 'en'
+      }
       router.replace(locale + '/' + routeTo + '/' + (initData?.startParam ? initData.startParam : ''))
       webApp.ready()
       viewport.expand()
